@@ -1,0 +1,71 @@
+// styles.module.scss
+
+$primary-color: #35a077;
+$secondary-color: #2a805f;
+$highlight-color: #e6e6e6;
+$border-color: #ccc;
+
+.icon {
+	width: 30px;
+	height: 30px;
+}
+
+.table {
+	width: 100%;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+	border-collapse: collapse;
+
+	th,
+	td {
+		text-align: left;
+		vertical-align: top;
+		border-right: 1px solid $border-color;
+		border-left: 1px solid $border-color;
+		border-bottom: 1px solid $border-color;
+
+		&:first-child {
+			width: 50px;
+			text-align: center;
+		}
+
+		&:nth-child(2) {
+			width: 575px;
+		}
+
+		&:nth-child(3) {
+			width: 575px;
+		}
+
+		min-height: 200px; // Минимальная высота ячейки
+	}
+
+	th {
+		padding: 10px;
+		color: #fff;
+		border-top: 1px solid $border-color;
+		text-align: center;
+		background: $primary-color;
+
+		&:nth-child(odd) {
+			background: $secondary-color; // Чередование фона заголовков
+		}
+	}
+
+	tr {
+		transition: all 0.3s;
+
+		&.selected {
+			background-color: $highlight-color; // Цвет фона для выделенных строк
+		}
+	}
+}
+
+.info {
+	height: auto; // Высота автоматически подстраивается
+	padding: 15px;
+	position: relative;
+
+	&Edit {
+		position: relative;
+	}
+}
