@@ -1,14 +1,27 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import data from '../../data/companies.json';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import axios from 'axios';
 import { Company } from '../../types/company';
 
 interface CompaniesState {
 	companies: Company[];
+	status: 'idle' | 'loading' | 'succeeded' | 'failed';
+	error: string | null;
 }
 
 const initialState: CompaniesState = {
-	companies: data.companies as Company[],
+	companies: [],
+	status: 'idle',
+	error: null,
 };
+
+// Создаем асинхронный thunk для загрузки данных с API
+export const fetchCompanies = createAsyncThunk(
+	'companies/fetchCompanies',
+	async () => {
+		const response = await axios.get('https://dd6b73fe40abba67.mokky.dev/companыies');
+		return response.data
+	}
+);
 
 const companySlice = createSlice({
 	name: 'companies',
@@ -24,7 +37,7 @@ const companySlice = createSlice({
 			});
 		},
 		addCompany: (state, action: PayloadAction<Omit<Company, 'id' | 'isSelected'>>) => {
-			const newId = state.companies.length ? Math.max(...state.companies.map(c => c.id)) + 1 : 1; // Генерация нового ID
+			const newId = state.companies.length ? Math.max(...state.companies.map(c => c.id)) + 1 : 1;
 			state.companies.push({ ...action.payload, id: newId, isSelected: false });
 		},
 		removeSelectedCompanies: (state) => {
@@ -40,6 +53,20 @@ const companySlice = createSlice({
 				company.address = action.payload.address;
 			}
 		},
+	},
+	extraReducers: (builder) => {
+		builder
+			.addCase(fetchCompanies.pending, (state) => {
+				state.status = 'loading';
+			})
+			.addCase(fetchCompanies.fulfilled, (state, action) => {
+				state.status = 'succeeded';
+				state.companies = action.payload; // сохраняем данные
+			})
+			.addCase(fetchCompanies.rejected, (state, action) => {
+				state.status = 'failed';
+				state.error = action.error.message || 'Failed to load companies';
+			});
 	},
 });
 
