@@ -1,32 +1,23 @@
-import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Company } from '../../types/company';
-
 interface CompaniesState {
 	companies: Company[];
-	status: 'idle' | 'loading' | 'succeeded' | 'failed';
-	error: string | null;
+	page: number;
 }
-
 const initialState: CompaniesState = {
 	companies: [],
-	status: 'idle',
-	error: null,
+	page: 1,
 };
-
-// Создаем асинхронный thunk для загрузки данных с API
-export const fetchCompanies = createAsyncThunk(
-	'companies/fetchCompanies',
-	async () => {
-		const response = await axios.get('https://dd6b73fe40abba67.mokky.dev/companыies');
-		return response.data
-	}
-);
-
 const companySlice = createSlice({
 	name: 'companies',
 	initialState,
 	reducers: {
+		setCompanies: (state, action: PayloadAction<Company[]>) => {
+			state.companies = action.payload;
+		},
+		incrementPage: (state) => {
+			state.page += 1;
+		},
 		selectCompany: (state, action: PayloadAction<number>) => {
 			const company = state.companies.find((c) => c.id === action.payload);
 			if (company) company.isSelected = !company.isSelected;
@@ -37,7 +28,7 @@ const companySlice = createSlice({
 			});
 		},
 		addCompany: (state, action: PayloadAction<Omit<Company, 'id' | 'isSelected'>>) => {
-			const newId = state.companies.length ? Math.max(...state.companies.map(c => c.id)) + 1 : 1;
+			const newId = state.companies.length ? Math.max(...state.companies.map(c => c.id)) + 1 : 1; // Генерация нового ID
 			state.companies.push({ ...action.payload, id: newId, isSelected: false });
 		},
 		removeSelectedCompanies: (state) => {
@@ -54,22 +45,6 @@ const companySlice = createSlice({
 			}
 		},
 	},
-	extraReducers: (builder) => {
-		builder
-			.addCase(fetchCompanies.pending, (state) => {
-				state.status = 'loading';
-			})
-			.addCase(fetchCompanies.fulfilled, (state, action) => {
-				state.status = 'succeeded';
-				state.companies = action.payload; // сохраняем данные
-			})
-			.addCase(fetchCompanies.rejected, (state, action) => {
-				state.status = 'failed';
-				state.error = action.error.message || 'Failed to load companies';
-			});
-	},
 });
-
-export const { selectCompany, selectAllCompanies, addCompany, removeSelectedCompanies, updateCompany } = companySlice.actions;
-
+export const { selectCompany, selectAllCompanies, addCompany, removeSelectedCompanies, updateCompany, setCompanies, incrementPage } = companySlice.actions;
 export default companySlice.reducer;
