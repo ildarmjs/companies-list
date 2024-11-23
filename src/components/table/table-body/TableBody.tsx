@@ -6,17 +6,20 @@ import Loading from '../../ui/loading/Loading'
 import { useCompany } from '../../../hooks/useCompany'
 import { useInfinityScroll } from '../../../hooks/useInfinityScroll'
 import { useEditableCompany } from '../../../hooks/useEditableCompany'
+import ErrorMessage from '../../ui/eror-message/ErrorMessage'
 
 const TableBody: FC = () => {
-	const { companies, loading, setFetching } = useCompany()
+	const { companies, loading, error, setFetching } = useCompany()
 	const editableCompany = useEditableCompany()
 	useInfinityScroll(() => setFetching(true))
 
 	const renderCompanies = () => {
-		if (companies.length === 0) {
+		if (error) {
+			return <ErrorMessage text={error} />
+		}
+		if (!companies.length) {
 			return <NoCompaniesMessage />
 		}
-
 		return companies.map(company => (
 			<TableRow key={company.id} company={company} {...editableCompany} />
 		))

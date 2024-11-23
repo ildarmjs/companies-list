@@ -10,11 +10,13 @@ export const useCompany = () => {
 	const { companies, page } = useSelector((state: RootState) => state.companies);
 	const [fetching, setFetching] = useState(true);
 	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
 
 	useEffect(() => {
 		const fetchCompanies = async () => {
 			if (fetching) {
 				setLoading(true);
+				setError(null);
 				try {
 					const response = await axios.get(
 						`${API_BASE_URL}${ENDPOINTS.COMPANIES}?page=${page}`
@@ -24,6 +26,7 @@ export const useCompany = () => {
 					dispatch(incrementPage());
 				} catch (error) {
 					console.error('Error fetching companies:', error);
+					setError('Произошла ошибка при загрузке данных. Пожалуйста, попробуйте позже.');
 				} finally {
 					setLoading(false);
 					setFetching(false);
@@ -34,5 +37,5 @@ export const useCompany = () => {
 		fetchCompanies();
 	}, [fetching]);
 
-	return { companies, loading, setFetching };
+	return { companies, loading, error, setFetching };
 };
