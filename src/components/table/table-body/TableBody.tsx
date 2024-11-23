@@ -1,53 +1,74 @@
 import { FC, useEffect, useState } from 'react'
 import TableRow from '../table-row/TableRow'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '../../../store/store'
+import { RootState } from '../../../store/store'
 import ErrorBoundary from '../../error-boundary/ErrorBoundary'
 import NoCompaniesMessage from '../../no-companies-message/NoCompaniesMessage'
-import { fetchCompanies } from '../../../store/slices/companySlice'
-import Loading from '../../ui/loading/Loading'
-import ErrorMessage from '../../ui/eror-message/ErrorMessage'
+import { incrementPage, setCompanies } from '../../../store/slices/companySlice'
 
 const TableBody: FC = () => {
-	const dispatch: AppDispatch = useDispatch()
-	const { companies, status } = useSelector(
-		(state: RootState) => state.companies
-	)
-	console.log('companies:', companies)
+	const { companies, page } = useSelector((state: RootState) => state.companies)
 	const [editingNameId, setEditingNameId] = useState<number | null>(null)
 	const [editingAddressId, setEditingAddressId] = useState<number | null>(null)
-
+	const [fetching, setFetching] = useState(true)
 	const [editedName, setEditedName] = useState('')
 	const [editedAddress, setEditedAddress] = useState('')
+	const dispatch = useDispatch()
+
 	useEffect(() => {
-		if (status === 'idle') {
-			dispatch(fetchCompanies())
+		const fetchCompanies = async () => {
+			if (fetching) {
+				try {
+					const response = await fetch(
+						`https://dd6b73fe40abba67.mokky.dev/companies?page=${page}`
+					)
+					const data = await response.json()
+					dispatch(setCompanies([...companies, ...data.items]))
+					dispatch(incrementPage())
+				} catch (error) {
+					console.error('Error fetching companies:', error)
+				} finally {
+					setFetching(false)
+				}
+			}
 		}
-	}, [status, dispatch])
 
-	if (status === 'loading') return <Loading text='Загрузка...' />
-	if (status === 'failed')
-		return <ErrorMessage text='Ошибка при загрузке данных' />
-
+		fetchCompanies()
+	}, [fetching])
+	useEffect(() => {
+		document.addEventListener('scroll', scrollHandler)
+		return () => {
+			document.removeEventListener('scroll', scrollHandler)
+		}
+	}, [])
+	const scrollHandler = (e: Event) => {
+		const target = e.target as Document
+		if (
+			target.documentElement.scrollHeight -
+				(target.documentElement.scrollTop + window.innerHeight) <
+			100
+		) {
+			setFetching(true)
+		}
+	}
 	const renderCompanies = () => {
 		if (companies.length === 0) {
 			return <NoCompaniesMessage />
 		}
 
 		return companies.map(company => (
-			<ErrorBoundary key={company.id}>
-				<TableRow
-					company={company}
-					editedAddress={editedAddress}
-					editedName={editedName}
-					editingAddressId={editingAddressId}
-					editingNameId={editingNameId}
-					setEditedAddress={setEditedAddress}
-					setEditedName={setEditedName}
-					setEditingAddressId={setEditingAddressId}
-					setEditingNameId={setEditingNameId}
-				/>
-			</ErrorBoundary>
+			<TableRow
+				key={company.id}
+				company={company}
+				editedAddress={editedAddress}
+				editedName={editedName}
+				editingAddressId={editingAddressId}
+				editingNameId={editingNameId}
+				setEditedAddress={setEditedAddress}
+				setEditedName={setEditedName}
+				setEditingAddressId={setEditingAddressId}
+				setEditingNameId={setEditingNameId}
+			/>
 		))
 	}
 	return (
