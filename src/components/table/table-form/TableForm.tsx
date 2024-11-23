@@ -12,32 +12,45 @@ const TableForm: FC<ITableFormProps> = ({}) => {
 
 	const [newCompanyName, setNewCompanyName] = useState('')
 	const [newCompanyAddress, setNewCompanyAddress] = useState('')
+	const [errorMessage, setErrorMessage] = useState('')
+	const [isSubmitted, setIsSubmitted] = useState(false)
 
 	const handleAddCompany = () => {
-		if (newCompanyName && newCompanyAddress) {
-			dispatch(addCompany({ name: newCompanyName, address: newCompanyAddress }))
-			setNewCompanyName('')
-			setNewCompanyAddress('')
+		setIsSubmitted(true)
+		if (!newCompanyName || !newCompanyAddress) {
+			setErrorMessage('Пожалуйста, заполните все поля.')
+			return
 		}
+
+		dispatch(addCompany({ name: newCompanyName, address: newCompanyAddress }))
+		setNewCompanyName('')
+		setNewCompanyAddress('')
+		setErrorMessage('')
+		setIsSubmitted(false)
 	}
 	return (
-		<div className={styles.companyForm}>
-			<Input
-				value={newCompanyName}
-				onChange={e => setNewCompanyName(e.target.value)}
-				placeholder='Название компании'
-			/>
-			<Input
-				value={newCompanyAddress}
-				onChange={e => setNewCompanyAddress(e.target.value)}
-				placeholder='Адрес компании'
-			/>
-			<Button
-				text='Добавить компанию'
-				onClick={handleAddCompany}
-				variant='add'
-			/>
-		</div>
+		<>
+			<div className={styles.companyForm}>
+				<Input
+					value={newCompanyName}
+					onChange={e => setNewCompanyName(e.target.value)}
+					isError={isSubmitted && newCompanyName.length === 0}
+					placeholder='Название компании'
+				/>
+				<Input
+					value={newCompanyAddress}
+					onChange={e => setNewCompanyAddress(e.target.value)}
+					isError={isSubmitted && newCompanyAddress.length === 0}
+					placeholder='Адрес компании'
+				/>
+				<Button
+					text='Добавить компанию'
+					onClick={handleAddCompany}
+					variant='add'
+				/>
+			</div>
+			{errorMessage && <div className={styles.error}>{errorMessage}</div>}
+		</>
 	)
 }
 
