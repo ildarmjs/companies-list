@@ -1,50 +1,42 @@
-# React + TypeScript + Vite
+# Список компаний
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Это одностраничное приложение, построенное с использованием **React.js**, **Redux Toolkit** и **TypeScript**, предназначенное для управления списком компаний. Оно позволяет пользователям просматривать, редактировать, добавлять и удалять компании в таблице с динамическими возможностями, такими как выбор строк и редактирование на месте.
 
-Currently, two official plugins are available:
+### [Demo](https://companies-list-blue.vercel.app/)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Возможности:
 
-## Expanding the ESLint configuration
+- **Динамическая таблица**: Отображение данных компаний с колонками для чекбоксов, названия и адреса.
+- **Редактирование на месте**: Возможность редактирования названия и адреса компании.
+- **Выбор/Снятие выбора**: Выбор отдельных строк или всех сразу через чекбоксы.
+- **Добавление/Удаление**: Добавление новых компаний и удаление выбранных.
+- **Динамическая загрузка данных**: Загрузка данных при прокрутке для работы с большими наборами данных.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Технологии:
 
-- Configure the top-level `parserOptions` property like this:
+- **React.js**
+- **Redux Toolkit**
+- **TypeScript**
+- **SCSS**
+- **axios**
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Установка:
+
+### 1. Клонировать репозиторий
+
+```bash
+git clone https://github.com/ildarmjs/companies-list.git
+cd companies-list
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+### 2. Установить зависимости
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+```bash
+npm isntall
+```
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+### 3. Запустить приложение
+
+```bash
+npm run dev
 ```
